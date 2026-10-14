@@ -1,6 +1,6 @@
 import dns from "node:dns";
 import net from "node:net";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "./generated/prisma/client.js";
 import { PrismaPg } from "@prisma/adapter-pg";
 import dotenv from "dotenv";
 
