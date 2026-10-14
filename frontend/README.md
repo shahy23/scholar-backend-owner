@@ -48,25 +48,16 @@ Ensure you have the following installed:
 > This project **cannot run** without a valid environment configuration. For security reasons, sensitive keys and database URLs are not shared publicly.
 
 1. Create a `.env` file in the root directory.
-2. Follow the structure below (keys only):
+2. This app reads exactly one variable (keys only):
 
 ```env
-# Prisma & Database
-DEV_DB=""
-DIRECT_URL=""
-
-# Authentication
-BETTER_AUTH_SECRET=""
-NEXT_PUBLIC_APP_URL="http://localhost:3000"
-
-# AI & Third-Party Services
-GEMINI_API_KEY=""
-S2_API_KEY=""
-
-# Supabase
-SUPABASE_URL=""
-SUPABASE_ANON_KEY=""
+# URL of the Express backend (repo root). Used by next.config.ts rewrites
+# and src/lib/api-client.ts to proxy /api/* calls.
+BACKEND_URL="http://localhost:5000"
 ```
+
+Variables like `DEV_DB`, `SUPABASE_*`, or `NEXT_PUBLIC_APP_URL` belong to the
+backend (repo root) and are not read by this frontend.
 
 #### Requesting Access
 
@@ -74,6 +65,28 @@ If you are a contributor, please reach out to the project maintainer to obtain t
 
 - **Maintainer**: Marwan Mamdouh
 - **Email**: [marwanabdalmagied@gmail.com](mailto:marwanabdalmagied@gmail.com)
+
+---
+
+## ☁️ Deploying on Vercel
+
+The frontend lives in the `frontend/` folder of the backend repository, so a
+Vercel project needs two settings:
+
+1. **Root Directory**: set to `frontend` (Project Settings → General). Vercel
+   then installs and builds only this folder using `frontend/vercel.json`
+   (Next.js preset). The repo-root `vercel.json` (Express backend) is ignored.
+2. **Environment Variable**: `BACKEND_URL` — the URL of the deployed Express
+   backend (e.g. `https://your-backend.vercel.app`). `next.config.ts` rewrites
+   `/api/*` to this origin; without it the browser falls back to
+   `http://localhost:5000` and every API call fails in production.
+
+For login to work through the proxy, the backend must also set
+`BETTER_AUTH_URL=https://<your-frontend.vercel.app>` (the frontend's origin),
+otherwise Better Auth answers `403 INVALID_ORIGIN`.
+
+To deploy from the CLI instead, run `vercel` inside this folder (or
+`vercel --cwd frontend` from the repo root).
 
 ---
 
